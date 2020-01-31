@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="297" pageHeight="595" columnWidth="257" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="91eb615b-815d-4103-b522-c153b7f2a1cb">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="191"/>
+	<parameter name="Iddetail" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+	c.Iddetail,
+	c.nama,  
+	c.jenis,
+	c.jumlah,
+	c.tglselesai,
+	c.biayalaundry
+FROM transaksiku c
+where c.Iddetail = $P{Iddetail}]]>
+	</queryString>
+	<field name="Iddetail" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nama" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="jenis" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="jumlah" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tglselesai" class="java.sql.Date">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="biayalaundry" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="variable1" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{biayalaundry}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="67" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="257" height="17" uuid="159302cf-6f19-48eb-a9e3-91eb0eaa4071"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PUTRA LAUNDRY ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="17" width="257" height="35" uuid="d3b6afeb-2aa6-43a9-a1bf-80b900fc2cb8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Komplek Ruko Biram Dewa No.7, Simpang Kota Piring]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="52" width="257" height="15" uuid="f74ef8df-7631-4560-8c19-04e315961e9a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Telp (0771) 909090]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="72" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="12" width="100" height="20" uuid="644a262a-c739-48ce-867d-d613c73185f9"/>
+				<text><![CDATA[Iddetail]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="157" y="12" width="100" height="20" uuid="98b4ee97-036a-49b4-a493-58c744802d91"/>
+				<textFieldExpression><![CDATA[$F{Iddetail}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="157" y="32" width="100" height="20" uuid="55fe44ca-af34-4602-96a3-9fd3da2cbc32"/>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="32" width="100" height="20" uuid="01e6e55e-90b4-4c50-9546-5cb9dc050060"/>
+				<text><![CDATA[nama]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="52" width="100" height="20" uuid="488af970-8e3d-4dec-9731-fe39cd2eed96"/>
+				<text><![CDATA[tglselesai]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="157" y="52" width="100" height="20" uuid="fd07416f-ddbe-4d7d-b310-46cc6182e348"/>
+				<textFieldExpression><![CDATA[$F{tglselesai}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="41" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="21" width="100" height="20" uuid="6001ac1b-2b93-4f96-88cd-3bc38e38ec56"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[jenis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="157" y="21" width="100" height="20" uuid="eff30c43-d463-4eb3-a427-a5680cdda1b0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[jumlah]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" uuid="1ad84bf0-c146-4cca-ab10-fd70ccf50637"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{jenis}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="157" y="0" width="100" height="20" uuid="fe4eb7db-bbda-4477-9aae-43be05d37db2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{jumlah}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="225" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="97" width="257" height="26" uuid="ef5595d1-7577-4e3b-8413-7d821c9452b3"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Bila jumlah pakaian telah diisi dengan tepat dan benar, maka jumlah yang kami hitung dianggap benar.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="123" width="257" height="33" uuid="83790fa3-6558-4d0e-9fa5-23523dbce57a"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Pengaduan / komplain berlaku 1x24 jam setelah cucian diambil, barang yang tidak diambil lebih dari 1 bulan bukan menjadi tanggung jawab kami.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="29" width="257" height="36" uuid="c1ee56db-35e9-4cd6-86ed-713024170603"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Kerusakan/luntur/sobek/susut pakaian dalam proses pencucian dan pengeringan yang disebabkan sifat dasar bahan pakaian bukan menjadi tanggung jawab kami / menjadi resiko konsumen.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="156" width="257" height="26" uuid="61d9c05d-f53d-48ca-a475-51e81cf3e243"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Kehilangan atau kerusakan barang akan diganti maksimal 10 kali ongkos cucian satuan.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="68" width="257" height="26" uuid="d7896aed-0cdd-43b3-a057-8fe28f928f56"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Hilangnya benda berharga yang tertinggal didalam pakaian bukan tanggung jawab kami.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="12" width="257" height="16" uuid="eb544139-8fef-4180-986b-0876c9c984fe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERHATIAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="205" width="100" height="20" uuid="4dfbf33b-6716-4651-9132-ab6edb974b72"/>
+				<text><![CDATA[biayalaundry]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="157" y="205" width="100" height="20" uuid="6776cddd-afbb-4493-bcee-a41c9418d33d"/>
+				<textFieldExpression><![CDATA[$V{variable1}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="11" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="10" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="297" pageHeight="595" columnWidth="257" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="91eb615b-815d-4103-b522-c153b7f2a1cb">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="96"/>
+	<parameter name="total" class="java.lang.String"/>
+	<parameter name="bayar" class="java.lang.String"/>
+	<parameter name="kembalian" class="java.lang.String"/>
+	<parameter name="Iddetail" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+	c.Iddetail,
+	c.nama,
+	c.jenis,
+	c.jumlah,
+	c.biayalaundry
+FROM transaksiku c
+where c.Iddetail = $P{Iddetail}]]>
+	</queryString>
+	<field name="Iddetail" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nama" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="jenis" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="jumlah" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="biayalaundry" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="variable1" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{biayalaundry}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="67" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="257" height="17" uuid="159302cf-6f19-48eb-a9e3-91eb0eaa4071"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PUTRA LAUNDRY ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="17" width="257" height="35" uuid="d3b6afeb-2aa6-43a9-a1bf-80b900fc2cb8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Komplek Ruko Biram Dewa No.7, Simpang Kota Piring]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="52" width="257" height="15" uuid="f74ef8df-7631-4560-8c19-04e315961e9a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Telp (0771) 909090]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="14" width="100" height="20" uuid="d4dfaeb7-d23c-4ee1-94bf-f84a7c4589de"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No Transaksi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="34" width="100" height="20" uuid="743a8909-c63f-4459-a13d-a8b8910cb53b"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nama]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="102" y="34" width="155" height="20" uuid="a6dd4383-784c-4b93-8647-ba70fbba0ff5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="14" width="155" height="20" uuid="d9297c5a-fc46-452b-9ba3-ce5875474551"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{Iddetail}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="1" width="257" height="20" uuid="df74d89a-bb85-4938-8d18-e27eb8cacd9e"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="1" width="186" height="20" uuid="c983de7e-cadc-4154-834a-873932eb9fc2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jenis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="186" y="1" width="71" height="20" uuid="24ebacfc-e9c3-4d6e-8d37-0033cbef5cf1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jumlah]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="257" height="20" uuid="6c131527-1a58-4c11-bb4c-e0857de00ed5"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="0" width="186" height="20" uuid="b13bb370-9700-41ae-96ce-eaabd04f0c02"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jenis}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="186" y="0" width="71" height="20" uuid="bd7fd396-e82b-4ab3-bec5-5c08ee5fbb12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jumlah}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="80" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="100" height="20" uuid="7a387d14-431c-4227-bc35-5d1a1b8e4a65"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="35" width="100" height="20" uuid="9a6bed9e-dc3a-4eec-baed-9262d82bbcbf"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bayar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="55" width="100" height="20" uuid="6044013c-6659-444d-af39-ad77b08028a8"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kembalian]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="102" y="15" width="155" height="20" uuid="668b90da-8146-4331-b07d-4ec28ff7c4d2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{total}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="102" y="35" width="155" height="20" uuid="ff15bb2e-6edb-4b2e-a80a-3cb39c5f75c1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{bayar}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="102" y="55" width="155" height="20" uuid="700fe339-a26f-41a4-b55f-77a74940af83"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{kembalian}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="11" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="186" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="86" width="257" height="26" uuid="ef5595d1-7577-4e3b-8413-7d821c9452b3"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Bila jumlah pakaian telah diisi dengan tepat dan benar, maka jumlah yang kami hitung dianggap benar.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="112" width="257" height="33" uuid="83790fa3-6558-4d0e-9fa5-23523dbce57a"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Pengaduan / komplain berlaku 1x24 jam setelah cucian diambil, barang yang tidak diambil lebih dari 1 bulan bukan menjadi tanggung jawab kami.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="18" width="257" height="36" uuid="c1ee56db-35e9-4cd6-86ed-713024170603"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Kerusakan/luntur/sobek/susut pakaian dalam proses pencucian dan pengeringan yang disebabkan sifat dasar bahan pakaian bukan menjadi tanggung jawab kami / menjadi resiko konsumen.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="145" width="257" height="26" uuid="61d9c05d-f53d-48ca-a475-51e81cf3e243"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Kehilangan atau kerusakan barang akan diganti maksimal 10 kali ongkos cucian satuan.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="57" width="257" height="26" uuid="d7896aed-0cdd-43b3-a057-8fe28f928f56"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Hilangnya benda berharga yang tertinggal didalam pakaian bukan tanggung jawab kami.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="1" width="257" height="16" uuid="eb544139-8fef-4180-986b-0876c9c984fe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERHATIAN]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
