@@ -4,17 +4,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormPelanggan.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormBelanja.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/backuprestore.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/koneksi/Database.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormJenisCuci.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormPembayaran1.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormLogin.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormStokBarang.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormMenu.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/backup.java</file>
-            <file>file:/C:/Users/EDI/Documents/NetBeansProjects/Laundry1.0/Laundry1.0/src/master/FormUpdateStatusMember.java</file>
+            <file>file:/D:/PROJECT/Repos/AplikasiPuteraLaundry/src/master/FormStokBarang.java</file>
+            <file>file:/D:/PROJECT/Repos/AplikasiPuteraLaundry/src/master/FormLaporanPendapatan.java</file>
         </group>
     </open-files>
 </project-private>

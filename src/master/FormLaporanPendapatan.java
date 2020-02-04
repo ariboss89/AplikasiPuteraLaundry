@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package master;
 
 import java.io.File;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 import koneksi.Database;
@@ -32,6 +34,20 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
     public FormLaporanPendapatan() {
         initComponents();
         setLocationRelativeTo(this);
+        ShowKategori();
+    }
+
+    private void ShowKategori() {
+        java.sql.Connection conn = new koneksi.Database().getConnection();
+        try {
+            java.sql.Statement stmt = conn.createStatement();
+            java.sql.ResultSet res = stmt.executeQuery("select *from jenis");
+            while (res.next()) {
+                cbKategori.addItem(res.getString("jenis"));
+            }
+        } catch (SQLException ex) {
+
+        }
     }
 
     /**
@@ -52,6 +68,8 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
+        cbKategori = new javax.swing.JComboBox();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -70,7 +88,7 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
         cbBulan.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ALL", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
 
         cbTahun.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        cbTahun.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+        cbTahun.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ALL", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel3.setText("PILIH TAHUN");
@@ -91,29 +109,35 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
             }
         });
 
+        cbKategori.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        cbKategori.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ALL" }));
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel5.setText("PILIH KATEGORI");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(0, 294, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(cbBulan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cbTahun, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))))
-                .addContainerGap())
-            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(83, 83, 83)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
                 .addComponent(jLabel4))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cbBulan, 0, 161, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(cbTahun, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                        .addComponent(cbKategori, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -132,8 +156,12 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(cbTahun, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbKategori, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -169,30 +197,30 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        if(cbBulan.getSelectedItem().equals("ALL")){
-            java.sql.Connection conn= new Database().getConnection();
-            try{
+        if (cbBulan.getSelectedItem().equals("ALL") && cbKategori.getSelectedItem().equals("ALL")) {
+            java.sql.Connection conn = new Database().getConnection();
+            try {
                 HashMap parameter = new HashMap();
                 File file = new File("src/report/LaporanPendapatan.jrxml");
                 String bulan = cbBulan.getSelectedItem().toString();
                 String tahun = cbTahun.getSelectedItem().toString();
                 parameter.put("bulan", bulan);
                 parameter.put("tahun", tahun);
+
                 JasperDesign jasperDesign = JRXmlLoader.load(file);
-                String sql="select *from pembayaranku where tanggal like '%"+cbTahun.getSelectedItem()+"%'";
-                JRDesignQuery newQuery=new JRDesignQuery();
+                String sql = "select *from pembayaranku where tanggal like '%" + cbTahun.getSelectedItem() + "%'";
+                JRDesignQuery newQuery = new JRDesignQuery();
                 newQuery.setText(sql);
                 jasperDesign.setQuery(newQuery);
-                JasperReport jasperReport=JasperCompileManager.compileReport(jasperDesign);
-                JasperPrint jasperPrint=JasperFillManager.fillReport(jasperReport, parameter, conn);
-                JasperViewer.viewReport(jasperPrint,false);
-            }catch(Exception e){
+                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameter, conn);
+                JasperViewer.viewReport(jasperPrint, false);
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e);
             }
-        }
-        else{
-            java.sql.Connection conn= new Database().getConnection();
-            try{
+        } else if (!cbBulan.getSelectedItem().equals("ALL") && !cbTahun.getSelectedItem().equals("ALL") && cbKategori.getSelectedItem().equals("ALL")) {
+            java.sql.Connection conn = new Database().getConnection();
+            try {
                 HashMap parameter = new HashMap();
                 String bulan = cbBulan.getSelectedItem().toString();
                 String tahun = cbTahun.getSelectedItem().toString();
@@ -200,18 +228,33 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
                 parameter.put("tahun", tahun);
                 File file = new File("src/report/LaporanPendapatan.jrxml");
                 JasperDesign jasperDesign = JRXmlLoader.load(file);
-                String sql="select *from pembayaranku where tanggal like '%"+cbBulan.getSelectedItem()+"%' AND tanggal like '%"+cbTahun.getSelectedItem()+"%'";
-                JRDesignQuery newQuery=new JRDesignQuery();
+                String sql = "select *from pembayaranku where tanggal like '%" + cbBulan.getSelectedItem() + "%' AND tanggal like '%" + cbTahun.getSelectedItem() + "%'";
+                JRDesignQuery newQuery = new JRDesignQuery();
                 newQuery.setText(sql);
                 jasperDesign.setQuery(newQuery);
-                JasperReport jasperReport=JasperCompileManager.compileReport(jasperDesign);
-                JasperPrint jasperPrint=JasperFillManager.fillReport(jasperReport, parameter, conn);
-                JasperViewer.viewReport(jasperPrint,false);
-            }catch(Exception e){
+                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameter, conn);
+                JasperViewer.viewReport(jasperPrint, false);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        } else {
+            java.sql.Connection conn = new Database().getConnection();
+            try {
+                HashMap parameter = new HashMap();
+                File file = new File("src/report/LaporanFilterByKategori.jasper");
+                String kategori = cbKategori.getSelectedItem().toString();
+                parameter.put("kategori", kategori);
+                JasperReport jp = (JasperReport) JRLoader.loadObject(file);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jp, parameter, conn);
+                JasperViewer.viewReport(jasperPrint, false);
+                JasperViewer.setDefaultLookAndFeelDecorated(true);
+
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e);
             }
         }
-     
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
@@ -226,7 +269,7 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -256,12 +299,14 @@ public class FormLaporanPendapatan extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cbBulan;
+    private javax.swing.JComboBox cbKategori;
     private javax.swing.JComboBox cbTahun;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables

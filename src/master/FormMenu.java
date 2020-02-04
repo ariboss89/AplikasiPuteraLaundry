@@ -428,7 +428,7 @@ public class FormMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_JenisMouseClicked
 
     private void TransaksiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TransaksiMouseClicked
-        new FormTransaksi1().show();
+        new FormTransaksi().show();
     }//GEN-LAST:event_TransaksiMouseClicked
 
     private void Transaksi1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Transaksi1MouseClicked

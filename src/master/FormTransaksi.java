@@ -63,15 +63,18 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         setTgl();
         setJam();
-        TampilData();
         ShowPelanggan();
         ShowKategori();
         Idtransaksi();
+        IdDetailTransaski();
+        TampilData();
         ShowPewangi();
         ShowDeterjen();
-        txt_notrans.setEditable(false);
+        txtIdTransaksi.setEditable(false);
         btn_bayar.setEnabled(false);
         btn_simpan.setEnabled(true);
+        btnSelesai.setEnabled(true);
+        txtBiayalaundry.setText("0");
 
         //------------------------- Form Posisi Tengah --------------------------//   
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -87,10 +90,10 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         try {
             HashMap parameter = new HashMap();
-            File file = new File("src/report/Nota.jasper");
+            File file = new File("src/report/NotaPutraLaundry.jasper");
             SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd");
-            String Id = txt_notrans.getText();
-            parameter.put("Id", Id);
+            String Id = TransaksiFunction.getIdDetailTransaksi();
+            parameter.put("Iddetail", Id);
 
             JasperReport jp = (JasperReport) JRLoader.loadObject(file);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jp, parameter, conn);
@@ -106,8 +109,9 @@ public class FormTransaksi extends javax.swing.JFrame {
     public void TampilData() {
         DftTblModel = new DefaultTableModel();
         DftTblModel.addColumn("Id");
-        DftTblModel.addColumn("Nama Pelanggan");
-        DftTblModel.addColumn("Jenis Laundry");
+        DftTblModel.addColumn("Id Detail");
+        DftTblModel.addColumn("Nama");
+        DftTblModel.addColumn("Jenis");
         DftTblModel.addColumn("Jumlah");
         DftTblModel.addColumn("Total");
         DftTblModel.addColumn("Tanggal Masuk");
@@ -120,11 +124,12 @@ public class FormTransaksi extends javax.swing.JFrame {
         java.sql.Connection conn = new Database().getConnection();
         try {
             java.sql.Statement stmt = conn.createStatement();
-            String SQL = " select*from transaksiku where statuspembayaran='BELUM SELESAI'";
+            String SQL = " select *from transaksiku where Iddetail = '" + transaksi.getIdDetailTransaksi() + "'";
             java.sql.ResultSet res = stmt.executeQuery(SQL);
             while (res.next()) {
                 DftTblModel.addRow(new Object[]{
                     res.getString("Id"),
+                    res.getString("Iddetail"),
                     res.getString("nama"),
                     res.getString("jenis"),
                     res.getString("jumlah"),
@@ -137,6 +142,8 @@ public class FormTransaksi extends javax.swing.JFrame {
                     res.getString("statuspembayaran")
                 });
             }
+            int a = jTable1.getRowCount();
+            transaksi.setJumlahData(a);
         } catch (Exception e) {
         }
 
@@ -149,10 +156,14 @@ public class FormTransaksi extends javax.swing.JFrame {
         TampilData();
         ShowPelanggan();
         Idtransaksi();
-        txt_notrans.setEditable(false);
+        txtIdTransaksi.setEditable(false);
         txtTotalHarga.setText("");
         txtTanggalSelesai.toString().equals("");
         txtJumlah.setText("");
+        txtJumlah.setEditable(true);
+        cbPengerjaan.setEnabled(true);
+        cbPengerjaan.setSelectedItem("PILIH");
+        txtBiayalaundry.setText("0");
     }
 
     private void ShowPelanggan() {
@@ -229,36 +240,64 @@ public class FormTransaksi extends javax.swing.JFrame {
         String jumlahLaundry = transaksi.getJumlahLaundry();
         int aJumlahLaundry = Integer.parseInt(String.valueOf(jumlahLaundry));
 
-        int minStok = aStokDeterjen - aJumlahLaundry;
+        String namaPewangi = stok.getNamaPewangi();
+        String stokPewangi = stok.getStokPewangi();
+        int aStokPewangi = Integer.parseInt(String.valueOf(stokPewangi));
+
+        int minStokPewangi = aStokPewangi - aJumlahLaundry;
+        stok.setTotalStokPewangi(minStokPewangi);
+
+        int realStokPewangi = aStokPewangi - stok.getMinStokPewangi();
+
+        int realStok = aStokDeterjen - stok.getMinStokDeterjen();
+
+        int minStok = realStok - aJumlahLaundry;
         stok.setTotalStokDeterjen(minStok);
 
         int minStokDeterjen = stok.getMinStokDeterjen();
 
-        java.sql.Connection conn = new Database().getConnection();
-        try {
-            java.sql.PreparedStatement stmt = conn.prepareStatement("update stok set qty ='" + stok.getTotalStokDeterjen() + "' where nama='" + stok.getNamaDeterjen() + "'");
+        if (aJumlahLaundry > realStok) {
+            JOptionPane.showMessageDialog(null, "Tidak Bisa di Proses Karena Stok Kurang !!!");
+            txtJumlah.setText("");
+            txtJumlah.requestFocus();
+        } else if (aJumlahLaundry > realStokPewangi) {
+            JOptionPane.showMessageDialog(null, "Tidak Bisa di Proses Karena Stok Kurang !!!");
+            txtJumlah.setText("");
+            txtJumlah.requestFocus();
+        } else {
+            java.sql.Connection conn = new Database().getConnection();
             try {
-                stmt.executeUpdate();
+                java.sql.PreparedStatement stmt = conn.prepareStatement("update stok set qty ='" + stok.getTotalStokDeterjen() + "' where nama='" + stok.getNamaDeterjen() + "'");
+                try {
+                    stmt.executeUpdate();
+                    UpdateStokPewangi();
+                    Save();
+                } catch (Exception e) {
+
+                }
             } catch (Exception e) {
 
             }
-        } catch (Exception e) {
-
         }
     }
 
     private void UpdateStokPewangi() {
-        String namaPewangi = stok.getNamaPewangi();
-        String stokPewangi = stok.getStokPewangi();
-        int aStokPewangi = Integer.parseInt(String.valueOf(stokPewangi));
-        String jumlahLaundry = transaksi.getJumlahLaundry();
-        int aJumlahLaundry = Integer.parseInt(String.valueOf(jumlahLaundry));
-
-        int minStok = aStokPewangi - aJumlahLaundry;
-        stok.setTotalStokPewangi(minStok);
-
-        int minStokPewangi = stok.getMinStokPewangi();
-
+//        String namaPewangi = stok.getNamaPewangi();
+//        String stokPewangi = stok.getStokPewangi();
+//        int aStokPewangi = Integer.parseInt(String.valueOf(stokPewangi));
+//        String jumlahLaundry = transaksi.getJumlahLaundry();
+//        int aJumlahLaundry = Integer.parseInt(String.valueOf(jumlahLaundry));
+//
+//        int minStokPewangi = aStokPewangi - aJumlahLaundry;
+//        stok.setTotalStokPewangi(minStokPewangi);
+//
+//        int realStokPewangi = aStokPewangi - stok.getMinStokPewangi();
+//  
+//        if (aJumlahLaundry > realStok) {
+//            JOptionPane.showMessageDialog(null, "Tidak Bisa di Proses Karena Stok Kurang !!!");
+//            txtJumlah.setText("");
+//            txtJumlah.requestFocus();
+//        } else {
         java.sql.Connection conn = new Database().getConnection();
         try {
             java.sql.PreparedStatement stmt = conn.prepareStatement("update stok set qty ='" + stok.getTotalStokPewangi() + "' where nama='" + cbKet.getSelectedItem() + "'");
@@ -269,6 +308,125 @@ public class FormTransaksi extends javax.swing.JFrame {
             }
         } catch (Exception e) {
 
+        }
+        //}
+    }
+
+    private void IdDetailTransaski() {
+        int byk_data;
+        byk_data = 0;
+        try {
+            Connection kon = DriverManager.getConnection(database, user, pass);
+            String sql = "select * from transaksi order by Id";
+            Statement stat = kon.createStatement();
+            ResultSet rs = stat.executeQuery(sql);
+            rs.last();
+            byk_data = rs.getRow();
+            if (byk_data == 0) {
+                transaksi.setIdDetailTransaksi("DT-01");
+            } else {
+                String id = rs.getString(1);
+                int n = Integer.parseInt(id.substring(3, 5)) + 1;
+                String nomor = "";
+                for (int i = 1; i <= 2 - String.valueOf(n).length(); i++) {
+                    nomor = nomor + "0";
+                }
+                nomor = "DT-" + nomor + String.valueOf(n);
+                transaksi.setIdDetailTransaksi(nomor);
+            }
+        } catch (Exception e) {
+            System.out.println("Error auto increment userID : " + e + "\n");
+        }
+    }
+
+    private void SaveDetailTransaksi() {
+        SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd");
+        String tgl = spf.format(txtTanggalSelesai.getDate());
+        java.sql.Connection conn = new Database().getConnection();
+        try {
+            java.sql.PreparedStatement stmt = conn.prepareStatement("insert into transaksi (Id, jumlahtransaksi, totaltransaksi, tanggal, status) values (?,?,?,?,?)");
+            try {
+                stmt.setString(1, transaksi.getIdDetailTransaksi());
+                stmt.setInt(2, transaksi.getJumlahData());
+                stmt.setInt(3, transaksi.getTotalBiaya());
+                stmt.setString(4, tgl);
+                stmt.setString(5, cbStatusPembayaran.getSelectedItem().toString());
+                stmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "GAGAL MENYIMPAN DATA !!!", "Pesan", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void SumPembayaran() {
+        int rowsCount = jTable1.getRowCount();
+        int sum = 0;
+        for (int i = 0; i < rowsCount; i++) {
+            sum = sum + Integer.parseInt(jTable1.getValueAt(i, 10).toString());
+        }
+        transaksi.setTotalBiaya(sum);
+    }
+
+    private void Save() {
+        String stokDeterjen = stok.getStokPewangi();
+        int aStokDeterjen = Integer.parseInt(String.valueOf(stokDeterjen));
+        int minStokDeterjen = stok.getMinStokDeterjen();
+
+        String stokPewangi = stok.getStokPewangi();
+        int aStokPewangi = Integer.parseInt(String.valueOf(stokPewangi));
+        int minStokPewangi = stok.getMinStokPewangi();
+
+        SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd");
+        String tgl = spf.format(txtTanggalSelesai.getDate());
+
+        if (minStokDeterjen == aStokDeterjen) {
+            JOptionPane.showMessageDialog(null, "Stok Deterjen Kurang, Silahkan Tambahkan Dahulu !");
+            new FormStokBarang().setVisible(true);
+            dispose();
+        } else if (minStokPewangi == aStokPewangi) {
+            JOptionPane.showMessageDialog(null, "Stok Pewangi Kurang, Silahkan Tambahkan Dahulu !");
+            new FormStokBarang().setVisible(true);
+            dispose();
+        } else if (txtJumlah.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "Jumlah Laundry Kosong !");
+            txtJumlah.requestFocus();
+        } else if (txtBiayalaundry.getText().equals("0")) {
+            JOptionPane.showMessageDialog(null, "Total Biaya Laundry Kosong !");
+            txtBiayalaundry.requestFocus();
+        } else {
+            java.sql.Connection conn = new Database().getConnection();
+            try {
+                java.sql.PreparedStatement stmt = conn.prepareStatement("insert into transaksiku (Id,Iddetail, nama,jenis,jumlah,totalharga,tglmasuk,tglselesai,ket,pengerjaan,biayalaundry,statuspembayaran) values (?,?,?,?,?,?,?,?,?,?,?,?)");
+                try {
+                    stmt.setString(1, txtIdTransaksi.getText());
+                    stmt.setString(2, transaksi.getIdDetailTransaksi());
+                    stmt.setString(3, cbNamaPelangan.getSelectedItem().toString());
+                    stmt.setString(4, cbJenisLaundry.getSelectedItem().toString());
+                    stmt.setString(5, txtJumlah.getText());
+                    stmt.setString(6, txtTotalHarga.getText());
+                    stmt.setString(7, txtTanggalMasuk.getText());
+                    stmt.setString(8, tgl);
+                    stmt.setString(9, cbKet.getSelectedItem().toString());
+                    stmt.setString(10, cbPengerjaan.getSelectedItem().toString());
+                    stmt.setString(11, txtBiayalaundry.getText());
+                    stmt.setString(12, cbStatusPembayaran.getSelectedItem().toString());
+
+                    String jumlah = txtJumlah.getText();
+                    transaksi.setJumlahLaundry(jumlah);
+                    stmt.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "MENYIMPAN DATA", "Pesan", JOptionPane.INFORMATION_MESSAGE);
+                    cbPengerjaan.setSelectedItem("PILIH");
+                    txtBiayalaundry.setText("0");
+                    Refresh();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "GAGAL MENYIMPAN DATA !!!", "Pesan", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (Exception e) {
+
+            }
         }
     }
 
@@ -302,9 +460,7 @@ public class FormTransaksi extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jPanel7 = new javax.swing.JPanel();
         btn_simpan = new javax.swing.JButton();
-        btn_refresh = new javax.swing.JButton();
-        btn_delete = new javax.swing.JButton();
-        btn_cancel = new javax.swing.JButton();
+        btnSelesai = new javax.swing.JButton();
         btn_bayar = new javax.swing.JButton();
         btn_exit = new javax.swing.JButton();
         jLabel18 = new javax.swing.JLabel();
@@ -314,7 +470,7 @@ public class FormTransaksi extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        txt_notrans = new javax.swing.JTextField();
+        txtIdTransaksi = new javax.swing.JTextField();
         jLabel17 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         cbNamaPelangan = new javax.swing.JComboBox();
@@ -403,6 +559,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.setEnabled(false);
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTable1MouseClicked(evt);
@@ -422,33 +579,13 @@ public class FormTransaksi extends javax.swing.JFrame {
             }
         });
 
-        btn_refresh.setBackground(new java.awt.Color(162, 138, 138));
-        btn_refresh.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        btn_refresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon/refresh.png"))); // NOI18N
-        btn_refresh.setText("REFRESH");
-        btn_refresh.addActionListener(new java.awt.event.ActionListener() {
+        btnSelesai.setBackground(new java.awt.Color(162, 138, 138));
+        btnSelesai.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        btnSelesai.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon/cancel.png"))); // NOI18N
+        btnSelesai.setText("SELESAI");
+        btnSelesai.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_refreshActionPerformed(evt);
-            }
-        });
-
-        btn_delete.setBackground(new java.awt.Color(162, 138, 138));
-        btn_delete.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        btn_delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon/delete.png"))); // NOI18N
-        btn_delete.setText("DELETE");
-        btn_delete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_deleteActionPerformed(evt);
-            }
-        });
-
-        btn_cancel.setBackground(new java.awt.Color(162, 138, 138));
-        btn_cancel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        btn_cancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon/cancel.png"))); // NOI18N
-        btn_cancel.setText("CANCEL DATA");
-        btn_cancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_cancelActionPerformed(evt);
+                btnSelesaiActionPerformed(evt);
             }
         });
 
@@ -477,32 +614,26 @@ public class FormTransaksi extends javax.swing.JFrame {
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(63, 63, 63)
+                .addGap(177, 177, 177)
                 .addComponent(btn_simpan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_refresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnSelesai)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_delete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btn_cancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_exit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(62, 62, 62))
+                .addGap(168, 168, 168))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_simpan)
-                    .addComponent(btn_refresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btn_delete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btn_cancel)
+                    .addComponent(btnSelesai)
                     .addComponent(btn_bayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btn_exit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(btn_exit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btn_simpan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(4, 4, 4))
         );
 
         jLabel18.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -528,12 +659,12 @@ public class FormTransaksi extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel18)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -544,9 +675,10 @@ public class FormTransaksi extends javax.swing.JFrame {
                     .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtCari))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         jPanel5.setBackground(new java.awt.Color(204, 0, 51));
@@ -570,9 +702,9 @@ public class FormTransaksi extends javax.swing.JFrame {
         txtBiayalaundry.setEditable(false);
         txtBiayalaundry.setText("0");
 
-        txt_notrans.addActionListener(new java.awt.event.ActionListener() {
+        txtIdTransaksi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_notransActionPerformed(evt);
+                txtIdTransaksiActionPerformed(evt);
             }
         });
 
@@ -701,7 +833,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                         .addGap(128, 128, 128)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cbNamaPelangan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txt_notrans)))
+                            .addComponent(txtIdTransaksi)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel11)
@@ -709,7 +841,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                         .addGap(110, 110, 110)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtBiayalaundry)
-                            .addComponent(cbStatusPembayaran, 0, 228, Short.MAX_VALUE)))
+                            .addComponent(cbStatusPembayaran, 0, 248, Short.MAX_VALUE)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8)
@@ -743,7 +875,7 @@ public class FormTransaksi extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_notrans, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtIdTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -801,6 +933,7 @@ public class FormTransaksi extends javax.swing.JFrame {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel6Layout.createSequentialGroup()
@@ -817,7 +950,8 @@ public class FormTransaksi extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -828,7 +962,7 @@ public class FormTransaksi extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
         );
 
         pack();
@@ -845,44 +979,18 @@ public class FormTransaksi extends javax.swing.JFrame {
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         int row = jTable1.getSelectedRow();
-        txt_notrans.setText(jTable1.getValueAt(row, 0).toString());
+        TransaksiFunction.setIdDetailTransaksi(jTable1.getValueAt(row, 0).toString());
         btn_bayar.setEnabled(true);
         btn_simpan.setEnabled(false);
+        btnSelesai.setEnabled(false);
     }//GEN-LAST:event_jTable1MouseClicked
-
-    private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
-
-    }//GEN-LAST:event_btn_deleteActionPerformed
 
     private void txtJumlahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtJumlahActionPerformed
 
     }//GEN-LAST:event_txtJumlahActionPerformed
 
-    private void btnrefresh1() {
-
-        if (btn_bayar.isEnabled()) {
-            btn_refresh.setEnabled(true);
-        } else {
-            btn_refresh.setEnabled(false);
-        }
-
-    }
-
-    private void btn_refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_refreshActionPerformed
-        RefreshTabel2();
-        RefreshTabel1();
-        RefreshTabel();
-        setTgl();
-        setJam();
-        bersih();
-        bersih_pesanan();
-        this.btn_exit.setEnabled(true);
-        Refresh();
-    }//GEN-LAST:event_btn_refreshActionPerformed
-
     private void btn_bayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_bayarActionPerformed
-        String Id = txt_notrans.getText();
-        TransaksiFunction.setIdTransaksi(Id);
+        TransaksiFunction.getIdTransaksi();
         new FormPembayaran().setVisible(true);
         dispose();
     }//GEN-LAST:event_btn_bayarActionPerformed
@@ -898,78 +1006,24 @@ public class FormTransaksi extends javax.swing.JFrame {
 
     }//GEN-LAST:event_txtJumlahKeyTyped
 
-    private void btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
-        JOptionPane.showMessageDialog(null, "Orderan Telah Dihapus");
-        CANCELDATA();
-        RefreshTabel2();
-        RefreshTabel1();
-        RefreshTabel();
-        bersih();
-        bersih_pesanan();
-        this.btn_exit.setEnabled(true);
-    }//GEN-LAST:event_btn_cancelActionPerformed
+    private void btnSelesaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelesaiActionPerformed
+        SumPembayaran();
+        SaveDetailTransaksi();
+        Cetak();
+        IdDetailTransaski();
+        Refresh();
+    }//GEN-LAST:event_btnSelesaiActionPerformed
 
-    private void txt_notransActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_notransActionPerformed
+    private void txtIdTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdTransaksiActionPerformed
 
-    }//GEN-LAST:event_txt_notransActionPerformed
+    }//GEN-LAST:event_txtIdTransaksiActionPerformed
 
     private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
-        String stokDeterjen = stok.getStokPewangi();
-        int aStokDeterjen = Integer.parseInt(String.valueOf(stokDeterjen));
-        int minStokDeterjen = stok.getMinStokDeterjen();
 
-        String stokPewangi = stok.getStokPewangi();
-        int aStokPewangi = Integer.parseInt(String.valueOf(stokPewangi));
-        int minStokPewangi = stok.getMinStokPewangi();
+        String jumlah = txtJumlah.getText();
+        transaksi.setJumlahLaundry(jumlah);
+        UpdateStokDeterjen();
 
-        SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd");
-        String tgl = spf.format(txtTanggalSelesai.getDate());
-
-        if (minStokDeterjen == aStokDeterjen) {
-            JOptionPane.showMessageDialog(null, "Stok Deterjen Kurang, Silahkan Tambahkan Dahulu !");
-            Refresh();
-            new FormStokBarang().setVisible(true);
-            dispose();
-        } else if (minStokPewangi == aStokPewangi) {
-            JOptionPane.showMessageDialog(null, "Stok Pewangi Kurang, Silahkan Tambahkan Dahulu !");
-            Refresh();
-            new FormStokBarang().setVisible(true);
-            dispose();
-        } else if (txtJumlah.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "Jumlah Laundry Kosong !");
-            txtJumlah.requestFocus();
-        } else {
-            java.sql.Connection conn = new Database().getConnection();
-            try {
-                java.sql.PreparedStatement stmt = conn.prepareStatement("insert into transaksiku (Id,nama,jenis,jumlah,totalharga,tglmasuk,tglselesai,ket,pengerjaan,biayalaundry,statuspembayaran) values (?,?,?,?,?,?,?,?,?,?,?)");
-                try {
-                    stmt.setString(1, txt_notrans.getText());
-                    stmt.setString(2, cbNamaPelangan.getSelectedItem().toString());
-                    stmt.setString(3, cbJenisLaundry.getSelectedItem().toString());
-                    stmt.setString(4, txtJumlah.getText());
-                    stmt.setString(5, txtTotalHarga.getText());
-                    stmt.setString(6, txtTanggalMasuk.getText());
-                    stmt.setString(7, tgl);
-                    stmt.setString(8, cbKet.getSelectedItem().toString());
-                    stmt.setString(9, cbPengerjaan.getSelectedItem().toString());
-                    stmt.setString(10, txtBiayalaundry.getText());
-                    stmt.setString(11, cbStatusPembayaran.getSelectedItem().toString());
-
-                    String jumlah = txtJumlah.getText();
-                    transaksi.setJumlahLaundry(jumlah);
-                    UpdateStokDeterjen();
-                    UpdateStokPewangi();
-                    stmt.executeUpdate();
-                    JOptionPane.showMessageDialog(null, "MENYIMPAN DATA", "Pesan", JOptionPane.INFORMATION_MESSAGE);
-                    Cetak();
-
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "GAGAL MENYIMPAN DATA !!!", "Pesan", JOptionPane.WARNING_MESSAGE);
-                }
-            } catch (Exception e) {
-
-            }
-        }
     }//GEN-LAST:event_btn_simpanActionPerformed
 
     private void txtTanggalMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTanggalMasukActionPerformed
@@ -1015,6 +1069,23 @@ public class FormTransaksi extends javax.swing.JFrame {
             ResultSet res = st.executeQuery("select *from jenis where jenis = '" + cbJenisLaundry.getSelectedItem() + "'");
             while (res.next()) {
                 txtHargaLaundry.setText(res.getString("harga"));
+
+                if (cbJenisLaundry.getSelectedItem().equals("Paket Hemat 1 25 Kg")) {
+                    txtHargaLaundry.setText(res.getString("harga"));
+                    txtJumlah.setText("25");
+                    txtJumlah.setEditable(false);
+                    txtTotalHarga.setText(res.getString("harga"));
+                } else if (cbJenisLaundry.getSelectedItem().equals("Paket Hemat 2 45 Kg")) {
+                    txtHargaLaundry.setText(res.getString("harga"));
+                    txtJumlah.setText("45");
+                    txtJumlah.setEditable(false);
+                    txtTotalHarga.setText(res.getString("harga"));
+                } else if (cbJenisLaundry.getSelectedItem().equals("Paket Hemat 1 65 Kg")) {
+                    txtHargaLaundry.setText(res.getString("harga"));
+                    txtJumlah.setText("65");
+                    txtJumlah.setEditable(false);
+                    txtTotalHarga.setText(res.getString("harga"));
+                }
             }
         } catch (SQLException ex) {
 
@@ -1024,24 +1095,38 @@ public class FormTransaksi extends javax.swing.JFrame {
     private void cbPengerjaanItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbPengerjaanItemStateChanged
         // TODO add your handling code here:
         int total = Integer.parseInt(txtTotalHarga.getText());
+        String status = txtStatusMember.getText().trim();
+        int a = Integer.parseInt(txtJumlah.getText());
+        int b;
+        int c = Integer.parseInt(txtTotalHarga.getText());
+        int diskon = ((c * 10) / 100);
+        int totale = c - diskon;
+
         if (cbPengerjaan.getSelectedItem().equals("PILIH")) {
-            JOptionPane.showMessageDialog(null, "PENGERJAAN BELUM DI PILIH ");
             cbPengerjaan.requestFocus();
-        } else if (cbPengerjaan.getSelectedItem().equals("Diantar")) {
-            int a = Integer.parseInt(txtJumlah.getText());
-            int b;
-            int c = Integer.parseInt(txtTotalHarga.getText());
+        } else if (cbPengerjaan.getSelectedItem().equals("Diantar") && status.equals("Member")) {
+
+            if (a < 5) {
+                b = totale + 6000;
+                txtBiayalaundry.setText(String.valueOf(b));
+            } else {
+                txtBiayalaundry.setText(String.valueOf(totale));
+            }
+        } else if (cbPengerjaan.getSelectedItem().equals("Diambil") && status.equals("Member")) {
+
+            txtBiayalaundry.setText(String.valueOf(totale));
+        }
+         else if (cbPengerjaan.getSelectedItem().equals("Diantar") && status.equals("Non Member")) {
+
             if (a < 5) {
                 b = c + 6000;
                 txtBiayalaundry.setText(String.valueOf(b));
-                cbPengerjaan.setEnabled(false);
             } else {
                 txtBiayalaundry.setText(String.valueOf(c));
-                cbPengerjaan.setEnabled(false);
             }
-        } else if (cbPengerjaan.getSelectedItem().equals("Diambil")) {
-            txtBiayalaundry.setText(String.valueOf(total));
-            cbPengerjaan.setEnabled(false);
+        } else if (cbPengerjaan.getSelectedItem().equals("Diambil") && status.equals("Non Member")) {
+
+            txtBiayalaundry.setText(String.valueOf(c));
         }
     }//GEN-LAST:event_cbPengerjaanItemStateChanged
 
@@ -1051,41 +1136,33 @@ public class FormTransaksi extends javax.swing.JFrame {
 
     private void txtCariKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCariKeyReleased
         // TODO add your handling code here:
-        DftTblModel = new DefaultTableModel();
-        DftTblModel.addColumn("Id");
-        DftTblModel.addColumn("Nama Pelanggan");
-        DftTblModel.addColumn("Jenis Laundry");
-        DftTblModel.addColumn("Jumlah");
-        DftTblModel.addColumn("Total");
-        DftTblModel.addColumn("Tanggal Masuk");
-        DftTblModel.addColumn("Tanggal Selesai");
-        DftTblModel.addColumn("Keterangan");
-        DftTblModel.addColumn("Pengerjaan");
-        DftTblModel.addColumn("Biaya Total");
-        DftTblModel.addColumn("Status Pembayaran");
-        jTable1.setModel(DftTblModel);
-        java.sql.Connection conn = new Database().getConnection();
-        try {
-            java.sql.Statement stmt = conn.createStatement();
-            String SQL = " select*from transaksiku where statuspembayaran='BELUM SELESAI' and Id = '" + txtCari.getText() + "'";
-            java.sql.ResultSet res = stmt.executeQuery(SQL);
-            while (res.next()) {
-                DftTblModel.addRow(new Object[]{
-                    res.getString("Id"),
-                    res.getString("nama"),
-                    res.getString("jenis"),
-                    res.getString("jumlah"),
-                    res.getString("totalharga"),
-                    res.getString("tglmasuk"),
-                    res.getString("tglselesai"),
-                    res.getString("ket"),
-                    res.getString("pengerjaan"),
-                    res.getString("biayalaundry"),
-                    res.getString("statuspembayaran")
-                });
+        if (!txtCari.getText().equals("")) {
+            DftTblModel = new DefaultTableModel();
+            DftTblModel.addColumn("Id");
+            DftTblModel.addColumn("Jumlah Transaksi");
+            DftTblModel.addColumn("Total");
+            jTable1.setModel(DftTblModel);
+            java.sql.Connection conn = new Database().getConnection();
+            try {
+                java.sql.Statement stmt = conn.createStatement();
+                String SQL = " select *from transaksi where Id like '%" + txtCari.getText() + "%' And status ='Belum Selesai'";
+                java.sql.ResultSet res = stmt.executeQuery(SQL);
+                while (res.next()) {
+                    DftTblModel.addRow(new Object[]{
+                        res.getString("Id"),
+                        res.getString("jumlahtransaksi"),
+                        res.getString("totaltransaksi")
+                    });
+                }
+                int a = jTable1.getRowCount();
+                transaksi.setJumlahData(a);
+                jTable1.setEnabled(true);
+            } catch (Exception e) {
             }
-        } catch (Exception e) {
+        } else {
+            TampilData();
         }
+
     }//GEN-LAST:event_txtCariKeyReleased
 
     private void cbStatusPembayaranItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbStatusPembayaranItemStateChanged
@@ -1106,7 +1183,7 @@ public class FormTransaksi extends javax.swing.JFrame {
             Class.forName(driver);
             Connection kon = DriverManager.getConnection(database, user, pass);
             Statement stt = kon.createStatement();
-            String SQL = "update transaksi set status='CANCEL' where no_trans='" + txt_notrans.getText() + "'";
+            String SQL = "update transaksi set status='CANCEL' where no_trans='" + txtIdTransaksi.getText() + "'";
             stt.executeUpdate(SQL);
             stt.close();
             kon.close();
@@ -1136,7 +1213,7 @@ public class FormTransaksi extends javax.swing.JFrame {
             Connection kon = DriverManager.getConnection(database, user, pass);
             Statement stt = kon.createStatement();
             String SQL = "update transaksi set biaya_laundry='" + txtBiayalaundry.getText()
-                    + "' where no_trans='" + txt_notrans.getText() + "'";
+                    + "' where no_trans='" + txtIdTransaksi.getText() + "'";
             stt.executeUpdate(SQL);
             stt.close();
             kon.close();
@@ -1367,7 +1444,7 @@ public class FormTransaksi extends javax.swing.JFrame {
 
     private boolean datavalid() {
         boolean result;
-        if ((txt_notrans.getText().equals(""))) {
+        if ((txtIdTransaksi.getText().equals(""))) {
             JOptionPane.showMessageDialog(null, "Isi data yang dibutuhkan");
             result = false;
         } else {
@@ -1420,7 +1497,7 @@ public class FormTransaksi extends javax.swing.JFrame {
             rs.last();
             byk_data = rs.getRow();
             if (byk_data == 0) {
-                this.txt_notrans.setText("T0000001");
+                this.txtIdTransaksi.setText("T0000001");
             } else {
                 String id = rs.getString(1);
                 int n = Integer.parseInt(id.substring(1, 8)) + 1;
@@ -1429,7 +1506,7 @@ public class FormTransaksi extends javax.swing.JFrame {
                     nomor = nomor + "0";
                 }
                 nomor = "T" + nomor + String.valueOf(n);
-                this.txt_notrans.setText(nomor);
+                this.txtIdTransaksi.setText(nomor);
             }
         } catch (Exception e) {
             System.out.println("Error auto increment faktur : " + e + "\n");
@@ -1449,8 +1526,8 @@ public class FormTransaksi extends javax.swing.JFrame {
     // Membersihkan Data ke posisi kosong ------------------------------------//
     private void bersih() {
         this.compare.setText("");
-        this.txt_notrans.setText("");
-        this.txt_notrans.setText("");
+        this.txtIdTransaksi.setText("");
+        this.txtIdTransaksi.setText("");
         this.total_kas.setText("0");
         this.total_kas_masuk.setText("0");
         this.txtBiayalaundry.setText("0");
@@ -1523,11 +1600,9 @@ public class FormTransaksi extends javax.swing.JFrame {
     private javax.swing.table.DefaultTableModel tblModel1 = getDefaultTabelModel1();
     private javax.swing.table.DefaultTableModel tblModel2 = getDefaultTabelModel2();
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnSelesai;
     private javax.swing.JButton btn_bayar;
-    private javax.swing.JButton btn_cancel;
-    private javax.swing.JButton btn_delete;
     private javax.swing.JButton btn_exit;
-    private javax.swing.JButton btn_refresh;
     private javax.swing.JButton btn_simpan;
     private javax.swing.JComboBox cbJenisLaundry;
     private javax.swing.JComboBox cbKet;
@@ -1571,6 +1646,7 @@ public class FormTransaksi extends javax.swing.JFrame {
     public static final transient javax.swing.JTextField txtBiayalaundry = new javax.swing.JTextField();
     private javax.swing.JTextField txtCari;
     public static final transient javax.swing.JTextField txtHargaLaundry = new javax.swing.JTextField();
+    private javax.swing.JTextField txtIdTransaksi;
     public static final transient javax.swing.JTextField txtJumlah = new javax.swing.JTextField();
     private javax.swing.JTextField txtStatusMember;
     public static final transient javax.swing.JTextField txtTanggalMasuk = new javax.swing.JTextField();
@@ -1579,7 +1655,6 @@ public class FormTransaksi extends javax.swing.JFrame {
     private javax.swing.JTextField txt_akhir_s;
     public static final transient javax.swing.JTextField txt_id_trans = new javax.swing.JTextField();
     public static final transient javax.swing.JTextField txt_idjenis = new javax.swing.JTextField();
-    private javax.swing.JTextField txt_notrans;
     private javax.swing.JTextField txt_status;
     public static final transient javax.swing.JTextField txt_total_update = new javax.swing.JTextField();
     // End of variables declaration//GEN-END:variables
