@@ -1,27 +1,8 @@
 ﻿# Host: localhost  (Version: 5.5.8)
-# Date: 2019-12-26 17:38:00
+# Date: 2020-02-05 14:00:17
 # Generator: MySQL-Front 5.3  (Build 4.81)
 
 /*!40101 SET NAMES utf8 */;
-
-#
-# Structure for table "barang"
-#
-
-DROP TABLE IF EXISTS `barang`;
-CREATE TABLE `barang` (
-  `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_kat` varchar(255) DEFAULT NULL,
-  `kategori` varchar(255) DEFAULT NULL,
-  `keterangan` varchar(255) DEFAULT NULL,
-  `qty` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-#
-# Data for table "barang"
-#
-
 
 #
 # Structure for table "belanja"
@@ -66,33 +47,8 @@ CREATE TABLE `data_pelanggan` (
 #
 
 /*!40000 ALTER TABLE `data_pelanggan` DISABLE KEYS */;
-INSERT INTO `data_pelanggan` VALUES ('P-01','DONO','TES','123131231','Non Member'),('P-02','INDRO','YES','164643453234','Non Member'),('P-03','ANDRE','Oi','01910102','Non Member');
+INSERT INTO `data_pelanggan` VALUES ('P-01','DONO','TES','123131231','Member'),('P-02','INDRO','YES','164643453234','Non Member'),('P-03','ANDRE','Oi','01910102','Non Member');
 /*!40000 ALTER TABLE `data_pelanggan` ENABLE KEYS */;
-
-#
-# Structure for table "detail_laundry"
-#
-
-DROP TABLE IF EXISTS `detail_laundry`;
-CREATE TABLE `detail_laundry` (
-  `id_trans` int(10) NOT NULL AUTO_INCREMENT,
-  `no_trans` varchar(10) NOT NULL,
-  `id_jenis` varchar(10) NOT NULL,
-  `jenis_cuci` varchar(30) NOT NULL,
-  `harga` int(10) NOT NULL,
-  `jml` int(10) NOT NULL,
-  `total` int(10) NOT NULL,
-  `ket` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id_trans`)
-) ENGINE=MyISAM AUTO_INCREMENT=80 DEFAULT CHARSET=latin1;
-
-#
-# Data for table "detail_laundry"
-#
-
-/*!40000 ALTER TABLE `detail_laundry` DISABLE KEYS */;
-INSERT INTO `detail_laundry` VALUES (56,'T0000001','C-03','Karpet',50000,1,50000,''),(62,'T0000002','C-01','Cuci+Setrika',6000,2,12000,''),(64,'T0000002','C-03','Karpet',50000,1,50000,''),(68,'T0000003','C-05','test',10000,1,10000,'');
-/*!40000 ALTER TABLE `detail_laundry` ENABLE KEYS */;
 
 #
 # Structure for table "jenis"
@@ -111,7 +67,7 @@ CREATE TABLE `jenis` (
 #
 
 /*!40000 ALTER TABLE `jenis` DISABLE KEYS */;
-INSERT INTO `jenis` VALUES ('C-01','Cuci+Setrika',6000),('C-02','Setrika',4000),('C-03','Karpet',50000),('C-04','hgh',2237),('C-05','test',10000);
+INSERT INTO `jenis` VALUES ('C-01','Cuci+Setrika',6000),('C-02','Setrika',4000),('C-03','Karpet',50000),('C-04','hgh',2237),('C-05','test',10000),('C-06','Paket Hemat 1 25 Kg',157500),('C-07','Paket Hemat 2 45 Kg',285500),('C-08','Paket Hemat 3 65 Kg',409500);
 /*!40000 ALTER TABLE `jenis` ENABLE KEYS */;
 
 #
@@ -176,14 +132,14 @@ CREATE TABLE `pembayaranku` (
   `kembalian` varchar(255) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
 
 #
 # Data for table "pembayaranku"
 #
 
 /*!40000 ALTER TABLE `pembayaranku` DISABLE KEYS */;
-INSERT INTO `pembayaranku` VALUES (3,'DT-01','2019-11-24','30000','50000','20000',NULL),(4,'DT-04','2019-11-24','18000','50000','32000',NULL),(5,'DT-05','2019-11-24','30000','40000','10000','SELESAI'),(6,'DT-06','2019-11-27','30000','50000','20000','SELESAI'),(7,'DT-10','2019-12-05','30000','120000','90000','SELESAI'),(8,'DT-16','2019-12-05','66000','100000','34000','SELESAI'),(9,'DT-15','2019-12-05','30000','50000','20000','SELESAI'),(10,'DT-14','2019-12-05','66000','100000','34000','SELESAI'),(11,'DT-12','2019-12-05','74000','100000','26000','SELESAI'),(12,'DT-13','2019-12-05','54000','60000','6000','SELESAI');
+INSERT INTO `pembayaranku` VALUES (13,'DT-01','2020-02-05','27000','27000','0','SELESAI');
 /*!40000 ALTER TABLE `pembayaranku` ENABLE KEYS */;
 
 #
@@ -205,7 +161,7 @@ CREATE TABLE `stok` (
 # Data for table "stok"
 #
 
-INSERT INTO `stok` VALUES ('B001','Rinso Cair','Sabun','SACHET',29,20),('B002','Molto Sakura','Pewangi','SACHET',29,20),('B003','Boom','Gaji Karyawan','SACHET',120,20);
+INSERT INTO `stok` VALUES ('B001','Rinso Cair','Sabun','SACHET',1,20),('B002','Molto Sakura','Pewangi','SACHET',21,20),('B003','Boom','Gaji Karyawan','SACHET',120,20);
 
 #
 # Structure for table "transaksi"
@@ -226,7 +182,7 @@ CREATE TABLE `transaksi` (
 #
 
 /*!40000 ALTER TABLE `transaksi` DISABLE KEYS */;
-INSERT INTO `transaksi` VALUES ('DT-01',1,'30000','2019-11-24','Selesai'),('DT-02',1,'30000','2019-11-24','Selesai'),('DT-03',1,'30000','2019-11-23','Selesai'),('DT-04',2,'18000','2019-11-24','Selesai'),('DT-05',1,'30000','2019-11-24','Selesai'),('DT-06',2,'0','2019-12-05','BELUM SELESAI'),('DT-07',1,'0','2019-12-05','BELUM SELESAI'),('DT-08',1,'0','2019-12-05','BELUM SELESAI'),('DT-09',5,'0','2019-12-05','BELUM SELESAI'),('DT-10',1,'30000','2019-12-05','SELESAI'),('DT-11',2,'80000','2019-12-05','BELUM SELESAI'),('DT-12',2,'74000','2019-12-05','SELESAI'),('DT-13',2,'54000','2019-12-05','SELESAI'),('DT-14',2,'66000','2019-12-05','SELESAI'),('DT-15',1,'30000','2019-12-05','SELESAI'),('DT-16',2,'66000','2019-12-05','SELESAI'),('DT-18',2,'42000','2019-12-19','BELUM SELESAI');
+INSERT INTO `transaksi` VALUES ('DT-01',1,'27000','2020-02-05','SELESAI');
 /*!40000 ALTER TABLE `transaksi` ENABLE KEYS */;
 
 #
@@ -255,7 +211,7 @@ CREATE TABLE `transaksiku` (
 #
 
 /*!40000 ALTER TABLE `transaksiku` DISABLE KEYS */;
-INSERT INTO `transaksiku` VALUES ('T0000001','DT-10','INDRO','Cuci+Setrika','5','30000','2019-12-04','2019-12-05','Molto Sakura','Diantar',30000,'SELESAI'),('T0000002','DT-11','INDRO','Cuci+Setrika','4','24000','2019-12-04','2019-12-05','Molto Sakura','Diantar',30000,'BELUM SELESAI'),('T0000003','DT-11','INDRO','Karpet','1','50000','2019-12-04','2019-12-05','Molto Sakura','Diambil',50000,'BELUM SELESAI'),('T0000004','DT-12','INDRO','Cuci+Setrika','3','18000','2019-12-04','2019-12-05','Molto Sakura','Diambil',18000,'SELESAI'),('T0000005','DT-12','INDRO','Karpet','1','50000','2019-12-04','2019-12-05','Molto Sakura','Diantar',56000,'SELESAI'),('T0000006','DT-13','INDRO','Cuci+Setrika','3','18000','2019-12-04','2019-12-05','Molto Sakura','Diantar',24000,'SELESAI'),('T0000007','DT-13','INDRO','Cuci+Setrika','5','30000','2019-12-04','2019-12-05','Molto Sakura','Diantar',30000,'SELESAI'),('T0000008','DT-14','INDRO','Cuci+Setrika','6','36000','2019-12-04','2019-12-05','Molto Sakura','Diantar',36000,'SELESAI'),('T0000009','DT-14','INDRO','Cuci+Setrika','5','30000','2019-12-04','2019-12-05','Molto Sakura','Diantar',30000,'SELESAI'),('T0000010','DT-15','INDRO','Cuci+Setrika','5','30000','2019-12-04','2019-12-05','Molto Sakura','Diantar',30000,'SELESAI'),('T0000011','DT-16','INDRO','Cuci+Setrika','4','24000','2019-12-04','2019-12-05','Molto Sakura','Diantar',30000,'SELESAI'),('T0000012','DT-16','INDRO','Cuci+Setrika','6','36000','2019-12-04','2019-12-05','Molto Sakura','Diantar',36000,'SELESAI'),('T0000013','DT-17','INDRO','Cuci+Setrika','2','12000','2019-12-18','2019-12-19','Molto Sakura','Diantar',18000,'BELUM SELESAI'),('T0000014','DT-18','INDRO','Cuci+Setrika','2','12000','2019-12-18','2019-12-19','Molto Sakura','Diantar',18000,'BELUM SELESAI'),('T0000015','DT-18','INDRO','Cuci+Setrika','3','18000','2019-12-18','2019-12-19','Molto Sakura','Diantar',24000,'BELUM SELESAI');
+INSERT INTO `transaksiku` VALUES ('T0000001','DT-01','DONO','Cuci+Setrika','5','30000','2020-02-04','2020-02-05','Molto Sakura','Diantar',27000,'SELESAI');
 /*!40000 ALTER TABLE `transaksiku` ENABLE KEYS */;
 
 #

@@ -23,6 +23,60 @@ public class Stok {
     private String qtyDeterjen;
     private int totalStokDeterjen;
     private int minStokDeterjen;
+    private String namaPemutih;
+    private String stokPemutih;
+    private String satuanPemutih;
+    private String qtyPemutih;
+    private int totalStokPemutih;
+    private int minStokPemutih;
+
+    public String getNamaPemutih() {
+        return namaPemutih;
+    }
+
+    public void setNamaPemutih(String namaPemutih) {
+        this.namaPemutih = namaPemutih;
+    }
+
+    public String getStokPemutih() {
+        return stokPemutih;
+    }
+
+    public void setStokPemutih(String stokPemutih) {
+        this.stokPemutih = stokPemutih;
+    }
+
+    public String getSatuanPemutih() {
+        return satuanPemutih;
+    }
+
+    public void setSatuanPemutih(String satuanPemutih) {
+        this.satuanPemutih = satuanPemutih;
+    }
+
+    public String getQtyPemutih() {
+        return qtyPemutih;
+    }
+
+    public void setQtyPemutih(String qtyPemutih) {
+        this.qtyPemutih = qtyPemutih;
+    }
+
+    public int getTotalStokPemutih() {
+        return totalStokPemutih;
+    }
+
+    public void setTotalStokPemutih(int totalStokPemutih) {
+        this.totalStokPemutih = totalStokPemutih;
+    }
+
+    public int getMinStokPemutih() {
+        return minStokPemutih;
+    }
+
+    public void setMinStokPemutih(int minStokPemutih) {
+        this.minStokPemutih = minStokPemutih;
+    }
 
     public String getNamaPewangi() {
         return namaPewangi;

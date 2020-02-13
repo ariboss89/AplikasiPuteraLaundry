@@ -70,6 +70,7 @@ public class FormTransaksi extends javax.swing.JFrame {
         TampilData();
         ShowPewangi();
         ShowDeterjen();
+        ShowBayclin();
         txtIdTransaksi.setEditable(false);
         btn_bayar.setEnabled(false);
         btn_simpan.setEnabled(true);
@@ -196,8 +197,8 @@ public class FormTransaksi extends javax.swing.JFrame {
         java.sql.Connection conn = new Database().getConnection();
         try {
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("select *from stok where kategori = 'Sabun' order by qty asc");
-            while (rs.next()) {
+            ResultSet rs = st.executeQuery("select *from stok where kategori = 'Sabun' order by qty desc");
+            if (rs.next()) {
                 String nama = rs.getString("nama");
                 stok.setNamaDeterjen(nama);
                 String satuan = rs.getString("satuan");
@@ -216,8 +217,8 @@ public class FormTransaksi extends javax.swing.JFrame {
         java.sql.Connection conn = new Database().getConnection();
         try {
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("select *from stok where kategori = 'Pewangi' order by qty asc");
-            while (rs.next()) {
+            ResultSet rs = st.executeQuery("select *from stok where kategori = 'Pewangi' order by qty desc");
+            if (rs.next()) {
                 String nama = rs.getString("nama");
                 stok.setNamaPewangi(nama);
                 cbKet.addItem(nama);
@@ -232,6 +233,26 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         }
     }
+    
+    private void ShowBayclin() {
+        java.sql.Connection conn = new Database().getConnection();
+        try {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("select *from stok where kategori = 'Pemutih' order by qty desc");
+            if (rs.next()) {
+                String nama = rs.getString("nama");
+                stok.setNamaPemutih(nama);
+                String satuan = rs.getString("satuan");
+                stok.setSatuanPemutih(satuan);
+                String qty = rs.getString("qty");
+                stok.setStokPemutih(qty);
+                int minStok = rs.getInt("minqty");
+                stok.setMinStokPemutih(minStok);
+            }
+        } catch (SQLException ex) {
+
+        }
+    }
 
     private void UpdateStokDeterjen() {
         String namaDeterjen = stok.getNamaDeterjen();
@@ -239,7 +260,12 @@ public class FormTransaksi extends javax.swing.JFrame {
         int aStokDeterjen = Integer.parseInt(String.valueOf(stokDeterjen));
         String jumlahLaundry = transaksi.getJumlahLaundry();
         int aJumlahLaundry = Integer.parseInt(String.valueOf(jumlahLaundry));
-
+        
+        int realStok = aStokDeterjen - stok.getMinStokDeterjen();
+        int minStok = realStok - aJumlahLaundry;
+        stok.setTotalStokDeterjen(minStok+stok.getMinStokDeterjen());
+        
+        //Pewangi
         String namaPewangi = stok.getNamaPewangi();
         String stokPewangi = stok.getStokPewangi();
         int aStokPewangi = Integer.parseInt(String.valueOf(stokPewangi));
@@ -249,13 +275,18 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         int realStokPewangi = aStokPewangi - stok.getMinStokPewangi();
 
-        int realStok = aStokDeterjen - stok.getMinStokDeterjen();
-
-        int minStok = realStok - aJumlahLaundry;
-        stok.setTotalStokDeterjen(minStok);
-
         int minStokDeterjen = stok.getMinStokDeterjen();
 
+        //Pemutih
+        String namaPemutih = stok.getNamaPemutih();
+        String stokPemutih = stok.getStokPemutih();
+        int aStokPemutih = Integer.parseInt(String.valueOf(stokPemutih));
+        
+        int realStokPemutih = aStokPemutih - stok.getMinStokPemutih();
+        int minStokPemutih = realStokPemutih - aJumlahLaundry;
+        stok.setTotalStokPemutih(minStokPemutih+stok.getMinStokPemutih());
+        
+        
         if (aJumlahLaundry > realStok) {
             JOptionPane.showMessageDialog(null, "Tidak Bisa di Proses Karena Stok Kurang !!!");
             txtJumlah.setText("");
@@ -264,13 +295,18 @@ public class FormTransaksi extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Tidak Bisa di Proses Karena Stok Kurang !!!");
             txtJumlah.setText("");
             txtJumlah.requestFocus();
-        } else {
+        } else if (aJumlahLaundry > realStokPemutih) {
+            JOptionPane.showMessageDialog(null, "Tidak Bisa di Proses Karena Stok Kurang !!!");
+            txtJumlah.setText("");
+            txtJumlah.requestFocus();
+        }else {
             java.sql.Connection conn = new Database().getConnection();
             try {
                 java.sql.PreparedStatement stmt = conn.prepareStatement("update stok set qty ='" + stok.getTotalStokDeterjen() + "' where nama='" + stok.getNamaDeterjen() + "'");
                 try {
                     stmt.executeUpdate();
                     UpdateStokPewangi();
+                    UpdateStokPemutih();
                     Save();
                 } catch (Exception e) {
 
@@ -310,6 +346,20 @@ public class FormTransaksi extends javax.swing.JFrame {
 
         }
         //}
+    }
+    
+    private void UpdateStokPemutih(){
+        java.sql.Connection conn = new Database().getConnection();
+        try {
+            java.sql.PreparedStatement stmt = conn.prepareStatement("update stok set qty ='" + stok.getTotalStokPemutih() + "' where nama='" + stok.getNamaPemutih() + "'");
+            try {
+                stmt.executeUpdate();
+            } catch (Exception e) {
+
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     private void IdDetailTransaski() {
